@@ -1,4 +1,4 @@
-Fast Fixed Point Biquad Filter Implementation
+&#x1F50A; Fast Fixed Point Biquad Filter Implementation
 ============================
 
 * Original code by Nigel Redmon (http://www.earlevel.com/main/2012/11/26/biquad-c-source-code/)
