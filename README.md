@@ -1,4 +1,4 @@
-Fixed Point Biquad Filter Implementation
+Fast Fixed Point Biquad Filter Implementation
 ============================
 
 * Original code by Nigel Redmon (http://www.earlevel.com/main/2012/11/26/biquad-c-source-code/)
@@ -17,7 +17,7 @@ Supported filter types:
 
 Supported data in:
 
-* 16 bit fixed point (fast calculation for MCU without FPU)
+* 16 bit fixed point (fast calculation for MCU without FPU e.g. ESP32)
 
 ----
 
