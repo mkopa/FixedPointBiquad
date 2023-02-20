@@ -1,6 +1,8 @@
 //
 //  FixedPointBiquad.h
 //
+//  Marcin Kopa: float version
+//
 //  Created by Nigel Redmon on 11/24/12
 //  EarLevel Engineering: earlevel.com
 //  Copyright 2012 Nigel Redmon
@@ -19,9 +21,8 @@
 #ifndef FixedPointBiquad_h
 #define FixedPointBiquad_h
 
-#include <Arduino.h>
-
-enum {
+enum
+{
     bq_type_lowpass = 0,
     bq_type_highpass,
     bq_type_bandpass,
@@ -31,31 +32,33 @@ enum {
     bq_type_highshelf
 };
 
-class FixedPointBiquad {
+class FixedPointBiquad
+{
 public:
     FixedPointBiquad();
-    FixedPointBiquad(int type, double Fc, double Q, double peakGainDB);
+    FixedPointBiquad(int type, float Fc, float Q, float peakGainDB);
     ~FixedPointBiquad();
     void setType(int type);
-    void setQ(double Q);
-    void setFc(double Fc);
-    void setPeakGain(double peakGainDB);
-    void setBiquad(int type, double Fc, double Q, double peakGain);
-    int16_t process(int16_t in);
-    
+    void setQ(float Q);
+    void setFc(float Fc);
+    void setPeakGain(float peakGainDB);
+    void setBiquad(int type, float Fc, float Q, float peakGain);
+    float process(float in);
+
 protected:
     void calcBiquad(void);
 
     int type;
-    int32_t a0, a1, a2, b1, b2;
-    double Fc, Q, peakGain;
-    int32_t z1, z2;
+    float a0, a1, a2, b1, b2;
+    float Fc, Q, peakGain;
+    float z1, z2;
 };
 
-inline int16_t FixedPointBiquad::process(int16_t in) {
-    int16_t out = in * a0 / 10000 + z1;
-    z1 = in * a1 / 10000 + z2 - b1 * out / 10000;
-    z2 = in * a2 / 10000 - b2 * out / 10000;
+inline float FixedPointBiquad::process(float in)
+{
+    float out = in * a0 + z1;
+    z1 = in * a1 + z2 - b1 * out;
+    z2 = in * a2 - b2 * out;
     return out;
 }
 

@@ -1,5 +1,7 @@
 //
-//  FixedPointBiquad.cpp
+//  FixedPointBiquad.h
+//
+//  Marcin Kopa: float version
 //
 //  Created by Nigel Redmon on 11/24/12
 //  EarLevel Engineering: earlevel.com
@@ -19,147 +21,163 @@
 #include <math.h>
 #include "FixedPointBiquad.h"
 
-FixedPointBiquad::FixedPointBiquad() {
+FixedPointBiquad::FixedPointBiquad()
+{
     type = bq_type_lowpass;
-    a0 = 1;
-    a1 = a2 = b1 = b2 = 0;
-    Fc = 0.50;
-    Q = 0.707;
-    peakGain = 0.0;
-    z1 = z2 = 0;
+    a0 = 1.0f;
+    a1 = a2 = b1 = b2 = 0.0f;
+    Fc = 0.50f;
+    Q = 0.707f;
+    peakGain = 0.0f;
+    z1 = z2 = 0.0f;
 }
 
-FixedPointBiquad::FixedPointBiquad(int type, double Fc, double Q, double peakGainDB) {
+FixedPointBiquad::FixedPointBiquad(int type, float Fc, float Q, float peakGainDB)
+{
     setBiquad(type, Fc, Q, peakGainDB);
-    z1 = z2 = 0;
+    z1 = z2 = 0.0f;
 }
 
-FixedPointBiquad::~FixedPointBiquad() {
+FixedPointBiquad::~FixedPointBiquad()
+{
 }
 
-void FixedPointBiquad::setType(int type) {
+void FixedPointBiquad::setType(int type)
+{
     this->type = type;
     calcBiquad();
 }
 
-void FixedPointBiquad::setQ(double Q) {
+void FixedPointBiquad::setQ(float Q)
+{
     this->Q = Q;
     calcBiquad();
 }
 
-void FixedPointBiquad::setFc(double Fc) {
+void FixedPointBiquad::setFc(float Fc)
+{
     this->Fc = Fc;
     calcBiquad();
 }
 
-void FixedPointBiquad::setPeakGain(double peakGainDB) {
+void FixedPointBiquad::setPeakGain(float peakGainDB)
+{
     this->peakGain = peakGainDB;
     calcBiquad();
 }
-    
-void FixedPointBiquad::setBiquad(int type, double Fc, double Q, double peakGainDB) {
+
+void FixedPointBiquad::setBiquad(int type, float Fc, float Q, float peakGainDB)
+{
     this->type = type;
     this->Q = Q;
     this->Fc = Fc;
     setPeakGain(peakGainDB);
 }
 
-void FixedPointBiquad::calcBiquad(void) {
-    double norm;
-    double V = pow(10, fabs(peakGain) / 20.0);
-    double K = tan(M_PI * Fc);
-    switch (this->type) {
-        case bq_type_lowpass:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = int32_t(K * K * norm * 10000.0);
-            a1 = 2 * a0;
-            a2 = a0;
-            b1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-            b2 = int32_t((1 - K / Q + K * K) * norm * 10000.0);
-            break;
-            
-        case bq_type_highpass:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = int32_t(1 * norm * 10000.0);
-            a1 = -2 * a0;
-            a2 = a0;
-            b1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-            b2 = int32_t((1 - K / Q + K * K) * norm * 10000.0);
-            break;
-            
-        case bq_type_bandpass:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = int32_t(K / Q * norm * 10000.0);
-            a1 = 0;
-            a2 = -a0;
-            b1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-            b2 = int32_t((1 - K / Q + K * K) * norm * 10000.0);
-            break;
-            
-        case bq_type_notch:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = int32_t((1 + K * K) * norm * 10000.0);
-            a1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-            a2 = a0;
+void FixedPointBiquad::calcBiquad(void)
+{
+    float norm;
+    float V = powf(10, fabsf(peakGain) / 20.0f);
+    float K = tanf(M_PI * Fc);
+    switch (this->type)
+    {
+    case bq_type_lowpass:
+        norm = 1.0f / (1.0f + K / Q + K * K);
+        a0 = K * K * norm;
+        a1 = 2.0f * a0;
+        a2 = a0;
+        b1 = 2.0f * (K * K - 1.0f) * norm;
+        b2 = (1.0f - K / Q + K * K) * norm;
+        break;
+
+    case bq_type_highpass:
+        norm = 1.0f / (1.0f + K / Q + K * K);
+        a0 = 1.0f * norm;
+        a1 = -2.0f * a0;
+        a2 = a0;
+        b1 = 2.0f * (K * K - 1.0f) * norm;
+        b2 = (1.0f - K / Q + K * K) * norm;
+        break;
+
+    case bq_type_bandpass:
+        norm = 1.0f / (1.0f + K / Q + K * K);
+        a0 = K / Q * norm;
+        a1 = 0.0f;
+        a2 = -a0;
+        b1 = 2.0f * (K * K - 1.0f) * norm;
+        b2 = (1.0f - K / Q + K * K) * norm;
+        break;
+
+    case bq_type_notch:
+        norm = 1.0f / (1.0f + K / Q + K * K);
+        a0 = (1.0f + K * K) * norm;
+        a1 = 2.0f * (K * K - 1.0f) * norm;
+        a2 = a0;
+        b1 = a1;
+        b2 = (1.0f - K / Q + K * K) * norm;
+        break;
+
+    case bq_type_peak:
+        if (peakGain >= 0)
+        { // boost
+            norm = 1.0f / (1.0f + 1.0f / Q * K + K * K);
+            a0 = (1.0f + V / Q * K + K * K) * norm;
+            a1 = 2.0f * (K * K - 1.0f) * norm;
+            a2 = (1.0f - V / Q * K + K * K) * norm;
             b1 = a1;
-            b2 = int32_t((1 - K / Q + K * K) * norm * 10000.0);
-            break;
-            
-        case bq_type_peak:
-            if (peakGain >= 0) {    // boost
-                norm = 1 / (1 + 1/Q * K + K * K);
-                a0 = int32_t((1 + V/Q * K + K * K) * norm * 10000.0);
-                a1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-                a2 = int32_t((1 - V/Q * K + K * K) * norm * 10000.0);
-                b1 = a1;
-                b2 = int32_t((1 - 1/Q * K + K * K) * norm * 10000.0);
-            }
-            else {    // cut
-                norm = 1 / (1 + V/Q * K + K * K);
-                a0 = int32_t((1 + 1/Q * K + K * K) * norm * 10000.0);
-                a1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-                a2 = int32_t((1 - 1/Q * K + K * K) * norm * 10000.0);
-                b1 = a1;
-                b2 = int32_t((1 - V/Q * K + K * K) * norm * 10000.0);
-            }
-            break;
-        case bq_type_lowshelf:
-            if (peakGain >= 0) {    // boost
-                norm = 1 / (1 + sqrt(2) * K + K * K);
-                a0 = int32_t((1 + sqrt(2*V) * K + V * K * K) * norm * 10000.0);
-                a1 = int32_t(2 * (V * K * K - 1) * norm * 10000.0);
-                a2 = int32_t((1 - sqrt(2*V) * K + V * K * K) * norm * 10000.0);
-                b1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-                b2 = int32_t((1 - sqrt(2) * K + K * K) * norm * 10000.0);
-            }
-            else {    // cut
-                norm = 1 / (1 + sqrt(2*V) * K + V * K * K);
-                a0 = int32_t((1 + sqrt(2) * K + K * K) * norm * 10000.0);
-                a1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-                a2 = int32_t((1 - sqrt(2) * K + K * K) * norm * 10000.0);
-                b1 = int32_t(2 * (V * K * K - 1) * norm * 10000.0);
-                b2 = int32_t((1 - sqrt(2*V) * K + V * K * K) * norm * 10000.0);
-            }
-            break;
-        case bq_type_highshelf:
-            if (peakGain >= 0) {    // boost
-                norm = 1 / (1 + sqrt(2) * K + K * K);
-                a0 = int32_t((V + sqrt(2*V) * K + K * K) * norm * 10000.0);
-                a1 = int32_t(2 * (K * K - V) * norm * 10000.0);
-                a2 = int32_t((V - sqrt(2*V) * K + K * K) * norm * 10000.0);
-                b1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-                b2 = int32_t((1 - sqrt(2) * K + K * K) * norm * 10000.0);
-            }
-            else {    // cut
-                norm = 1 / (V + sqrt(2*V) * K + K * K);
-                a0 = int32_t((1 + sqrt(2) * K + K * K) * norm * 10000.0);
-                a1 = int32_t(2 * (K * K - 1) * norm * 10000.0);
-                a2 = int32_t((1 - sqrt(2) * K + K * K) * norm * 10000.0);
-                b1 = int32_t(2 * (K * K - V) * norm * 10000.0);
-                b2 = int32_t((V - sqrt(2*V) * K + K * K) * norm * 10000.0);
-            }
-            break;
+            b2 = (1.0f - 1.0f / Q * K + K * K) * norm;
+        }
+        else
+        { // cut
+            norm = 1.0f / (1.0f + V / Q * K + K * K);
+            a0 = (1.0f + 1.0f / Q * K + K * K) * norm;
+            a1 = 2.0f * (K * K - 1.0f) * norm;
+            a2 = (1.0f - 1.0f / Q * K + K * K) * norm;
+            b1 = a1;
+            b2 = (1.0f - V / Q * K + K * K) * norm;
+        }
+        break;
+    case bq_type_lowshelf:
+        if (peakGain >= 0)
+        { // boost
+            norm = 1.0f / (1.0f + sqrtf(2.0f) * K + K * K);
+            a0 = (1.0f + sqrtf(2.0f * V) * K + V * K * K) * norm;
+            a1 = 2.0f * (V * K * K - 1.0f) * norm;
+            a2 = (1.0f - sqrtf(2.0f * V) * K + V * K * K) * norm;
+            b1 = 2.0f * (K * K - 1.0f) * norm;
+            b2 = (1.0f - sqrtf(2.0f) * K + K * K) * norm;
+        }
+        else
+        { // cut
+            norm = 1 / (1.0f + sqrtf(2.0f * V) * K + V * K * K);
+            a0 = (1.0f + sqrtf(2.0f) * K + K * K) * norm;
+            a1 = 2.0f * (K * K - 1.0f) * norm;
+            a2 = (1.0f - sqrtf(2.0f) * K + K * K) * norm;
+            b1 = 2.0f * (V * K * K - 1.0f) * norm;
+            b2 = (1.0f - sqrtf(2.0f * V) * K + V * K * K) * norm;
+        }
+        break;
+    case bq_type_highshelf:
+        if (peakGain >= 0)
+        { // boost
+            norm = 1 / (1.0f + sqrtf(2.0f) * K + K * K);
+            a0 = (V + sqrtf(2.0f * V) * K + K * K) * norm;
+            a1 = 2.0f * (K * K - V) * norm;
+            a2 = (V - sqrtf(2.0f * V) * K + K * K) * norm;
+            b1 = 2.0f * (K * K - 1.0f) * norm;
+            b2 = (1.0f - sqrtf(2.0f) * K + K * K) * norm;
+        }
+        else
+        { // cut
+            norm = 1.0f / (V + sqrtf(2.0f * V) * K + K * K);
+            a0 = (1.0f + sqrtf(2.0f) * K + K * K) * norm;
+            a1 = 2.0f * (K * K - 1.0f) * norm;
+            a2 = (1.0f - sqrtf(2.0f) * K + K * K) * norm;
+            b1 = 2.0f * (K * K - V) * norm;
+            b2 = (V - sqrtf(2.0f * V) * K + K * K) * norm;
+        }
+        break;
     }
-    
+
     return;
 }
