@@ -17,7 +17,7 @@ Supported filter types:
 
 Supported data in:
 
-* 16 bit fixed point (fast calculation for MCU without FPU e.g. ESP32)
+* 16/32 bit fixed point (fast calculation for MCU without FPU e.g. ESP32)
 
 ----
 
