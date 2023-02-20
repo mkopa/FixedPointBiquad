@@ -26,7 +26,7 @@ Methods:
 * Constructors
 
     FixedPointBiquad();
-    FixedPointBiquad(int type, double Fc, double Q, double peakGainDB);
+    FixedPointBiquad(int type, float Fc, float Q, float peakGainDB);
 
 * Destructor
 
@@ -34,16 +34,16 @@ Methods:
 
 * Configure the filter
 
-    void setBiquad(int type, double Fc, double Q, double peakGain);
+    void setBiquad(int type, float Fc, float Q, float peakGain);
 
 * Same as above but broken into separate parts
 
     void setType(int type);
-    void setQ(double Q);
-    void setFc(double Fc);
-    void setPeakGain(double peakGainDB);
+    void setQ(float Q);
+    void setFc(float Fc);
+    void setPeakGain(float peakGainDB);
 
 * Process a sample and return the filtered result
 
-    int16_t process(int16_t in);
+    float process(float in);
     
